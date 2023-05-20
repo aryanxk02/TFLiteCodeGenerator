@@ -22,6 +22,7 @@ import re
 from absl import app
 from absl import flags
 from mako import template
+import shutil
 
 from tensorflow.lite.tools import visualize as visualize
 
@@ -92,6 +93,11 @@ def GenerateMicroMutableOpsResolverHeaderFile(operators, name_of_model,
     }
     file_obj.write(build_template.render(**key_values_in_template))
 
+  # Rename the generated file to include the model name
+  generated_file_path = os.path.join(output_dir, 'gen_' + outfile)
+  model_name_without_extension = os.path.splitext(name_of_model)[0]
+  renamed_file_path = os.path.join(output_dir, f"{model_name_without_extension}_gen_{outfile}")
+  shutil.move(generated_file_path, renamed_file_path)
 
 def GetModelOperatorsAndActivation(model_path):
   """Extracts a set of operators from a tflite model."""
