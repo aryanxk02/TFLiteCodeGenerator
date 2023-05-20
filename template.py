@@ -2,17 +2,26 @@ import subprocess
 from string import Template
 import os
 import re
+import argparse
 
 # subprocess to run generate_cc_array.py
 """
 RUN from tools
 > python generate_cc_arrays.py esp/output_dir esp/TFLITE/hello_world.tflite 
 """
+
+parser = argparse.ArgumentParser(
+    description="Description: Accept .tflite or .bmp file as input from the user"
+)
+parser.add_argument("input_file", help=".tflite or .bmp format")
+args = parser.parse_args()
+tflite_file = args.input_file
+
 generate_cc_array = [
     "python",
     "generate_cc_arrays.py",
     "esp/output_dir",
-    "hello_world.tflite",
+    tflite_file,
 ]
 subprocess.run(generate_cc_array, check=True)
 
@@ -25,7 +34,7 @@ generate_micromutable_op_resolver = [
     "python",
     "gen_micro_mutable_op_resolver/generate_micro_mutable_op_resolver_from_model.py",
     "--common_tflite_path=.",
-    "--input_tflite_files=hello_world.tflite",
+    f"--input_tflite_files={tflite_file}",
     "--output_dir=esp/ops_resolver_output",
 ]
 subprocess.run(generate_micromutable_op_resolver, check=True)
@@ -163,7 +172,8 @@ with open("esp/ops_resolver_output/gen_micro_mutable_op_resolver.h") as cppfile:
 # print(operations)
 
 # extract model name from hello_world_model_data.cc
-with open("esp/output_dir/hello_world_model_data.cc", "r") as file:
+x = tflite_file.split(".")[0]
+with open(f"esp/output_dir/{x}_model_data.cc", "r") as file:
     cpp_content = file.read()
 
 pattern = r"const\s+unsigned\s+char\s+(\w+)\[\]"
@@ -176,16 +186,23 @@ else:
     print("Array name not found.")
 
 # VARIABLES
-kTensor_Arena_Size = int(input("Enter kTensor_Arena_Size: "))
+# kTensor_Arena_Size = int(input("Enter kTensor_Arena_Size: "))
 model_name = array_name
 num_of_operations = len(operations)
 resolver = "micro_op_resolver"
 
-results = cppTemplate.safe_substitute(
-    kTensor_Arena_Size=kTensor_Arena_Size,
-    model_name=array_name,
-    num_of_operations=num_of_operations,
-    resolver=resolver,
-)
 print("*"*100)
-print(results)
+print("model_name:", model_name)
+print("num of ops:", num_of_operations)
+print("Operations Description: ")
+for i in operations:
+    print(i)
+print("*"*100)
+# results = cppTemplate.safe_substitute(
+#     kTensor_Arena_Size=kTensor_Arena_Size,
+#     model_name=array_name,
+#     num_of_operations=num_of_operations,
+#     resolver=resolver,
+# )
+# print("*" * 100)
+# print(results)
