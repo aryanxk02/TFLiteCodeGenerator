@@ -160,9 +160,11 @@ void loop() {
 
 """
 )
+# extract model name from .tflite file
+x = tflite_file.split(".")[0]
 
 # extract operations from gen_micro_mutable_op_resolver.h
-with open("esp/ops_resolver_output/gen_micro_mutable_op_resolver.h") as cppfile:
+with open(f"esp/ops_resolver_output/{x}_gen_micro_mutable_op_resolver.h") as cppfile:
     operations = []
     for line in cppfile:
         if "micro_op_resolver." in line:
@@ -171,8 +173,7 @@ with open("esp/ops_resolver_output/gen_micro_mutable_op_resolver.h") as cppfile:
             operations.append(line)
 # print(operations)
 
-# extract model name from hello_world_model_data.cc
-x = tflite_file.split(".")[0]
+
 with open(f"esp/output_dir/{x}_model_data.cc", "r") as file:
     cpp_content = file.read()
 
