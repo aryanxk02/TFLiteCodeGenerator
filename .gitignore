@@ -1,0 +1,22 @@
+.output
+map.txt
+main/include/user_config.local.h
+bin
+build
+*.old
+*.swp
+sdkconfig
+config.local.h
+coredump.txt
+.settings
+.cproject
+.project
+config.local.h
+out.txt
+idf_modify_log.txt
+*.orig
+*.elf
+*.s
+
+## Mac OS files
+.DS_Store
