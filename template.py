@@ -63,8 +63,8 @@ limitations under the License.
 #include "tensorflow/lite/schema/schema_generated.h"
 
 // #include "main_functions.h"
-#include "gen_micro_mutable_op_resolver.h"
-#include "output_dir/hello_world_model_data.h"
+#include "${model_name_header}_gen_micro_mutable_op_resolver.h"
+#include "output_dir/${model_name_header}_model_data.h"
 // #include "constants.h"
 // #include "output_handler.h"
 
@@ -187,23 +187,27 @@ else:
     print("Array name not found.")
 
 # VARIABLES
-# kTensor_Arena_Size = int(input("Enter kTensor_Arena_Size: "))
+kTensor_Arena_Size = int(input("Enter kTensor_Arena_Size: "))
 model_name = array_name
 num_of_operations = len(operations)
 resolver = "micro_op_resolver"
-
+model_name_header = x
 print("*"*100)
 print("model_name:", model_name)
 print("num of ops:", num_of_operations)
+print("Model name header:", model_name_header)
 print("Operations Description: ")
 for i in operations:
     print(i)
 print("*"*100)
-# results = cppTemplate.safe_substitute(
-#     kTensor_Arena_Size=kTensor_Arena_Size,
-#     model_name=array_name,
-#     num_of_operations=num_of_operations,
-#     resolver=resolver,
-# )
-# print("*" * 100)
-# print(results)
+
+
+results = cppTemplate.safe_substitute(
+    kTensor_Arena_Size=kTensor_Arena_Size,
+    model_name=array_name,
+    num_of_operations=num_of_operations,
+    resolver=resolver,
+    model_name_header=x
+)
+print("*" * 100)
+print(results)
