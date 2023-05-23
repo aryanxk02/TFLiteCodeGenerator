@@ -1,44 +1,6 @@
-import subprocess
 from string import Template
-import os
-import re
-import argparse
 
-# subprocess to run generate_cc_array.py
-"""
-RUN from tools
-> python generate_cc_arrays.py esp/output_dir esp/TFLITE/hello_world.tflite 
-"""
-
-parser = argparse.ArgumentParser(
-    description="Description: Accept .tflite or .bmp file as input from the user"
-)
-parser.add_argument("input_file", help=".tflite or .bmp format")
-args = parser.parse_args()
-tflite_file = args.input_file
-
-generate_cc_array = [
-    "python",
-    "generate_cc_arrays.py",
-    "esp/output_dir",
-    tflite_file,
-]
-subprocess.run(generate_cc_array, check=True)
-
-# subprocess to run generate_micromutable_op_resolver.py
-"""
-RUN from tools
-> python gen_micro_mutable_op_resolver/generate_micro_mutable_op_resolver_from_model.py --common_tflite_path=esp/TFLITE --input_tflite_files=hello_world.tflite --output_dir=esp/ops_resolver_output
-"""
-generate_micromutable_op_resolver = [
-    "python",
-    "gen_micro_mutable_op_resolver/generate_micro_mutable_op_resolver_from_model.py",
-    "--common_tflite_path=.",
-    f"--input_tflite_files={tflite_file}",
-    "--output_dir=esp/ops_resolver_output",
-]
-subprocess.run(generate_micromutable_op_resolver, check=True)
-
+# main_functions.cc
 cppTemplate = Template(
     """
 /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
@@ -62,9 +24,9 @@ limitations under the License.
 #include "tensorflow/lite/micro/system_setup.h"
 #include "tensorflow/lite/schema/schema_generated.h"
 
-// #include "main_functions.h"
+#include "main_functions.h"
 #include "${model_name_header}_gen_micro_mutable_op_resolver.h"
-#include "output_dir/${model_name_header}_model_data.h"
+#include "${model_name_header}_model_data.h"
 // #include "constants.h"
 // #include "output_handler.h"
 
@@ -76,7 +38,7 @@ TfLiteTensor* input = nullptr;
 TfLiteTensor* output = nullptr;
 int inference_count = 0;
 
-constexpr int kTensorArenaSize = $kTensor_Arena_Size;
+constexpr int kTensorArenaSize = 2000;
 uint8_t tensor_arena[kTensorArenaSize];
 }  // namespace
 
@@ -160,54 +122,74 @@ void loop() {
 
 """
 )
-# extract model name from .tflite file
-x = tflite_file.split(".")[0]
 
-# extract operations from gen_micro_mutable_op_resolver.h
-with open(f"esp/ops_resolver_output/{x}_gen_micro_mutable_op_resolver.h") as cppfile:
-    operations = []
-    for line in cppfile:
-        if "micro_op_resolver." in line:
-            # print(line)
-            line = "".join(line.split())
-            operations.append(line)
-# print(operations)
+# main_functions.h
+main_functions = Template(
+    """
+/* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
+    http://www.apache.org/licenses/LICENSE-2.0
 
-with open(f"esp/output_dir/{x}_model_data.cc", "r") as file:
-    cpp_content = file.read()
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+==============================================================================*/
 
-pattern = r"const\s+unsigned\s+char\s+(\w+)\[\]"
-match = re.search(pattern, cpp_content)
+#ifndef TENSORFLOW_LITE_MICRO_EXAMPLES_HELLO_WORLD_MAIN_FUNCTIONS_H_
+#define TENSORFLOW_LITE_MICRO_EXAMPLES_HELLO_WORLD_MAIN_FUNCTIONS_H_
 
-if match:
-    array_name = match.group(1)
-    print("Array name:", array_name)
-else:
-    print("Array name not found.")
+// Expose a C friendly interface for main functions.
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-# VARIABLES
-kTensor_Arena_Size = int(input("Enter kTensor_Arena_Size: "))
-model_name = array_name
-num_of_operations = len(operations)
-resolver = "micro_op_resolver"
-model_name_header = x
-print("*"*100)
-print("model_name:", model_name)
-print("num of ops:", num_of_operations)
-print("Model name header:", model_name_header)
-print("Operations Description: ")
-for i in operations:
-    print(i)
-print("*"*100)
+// Initializes all data needed for the example. The name is important, and needs
+// to be setup() for Arduino compatibility.
+void setup();
 
+// Runs one iteration of data gathering and inference. This should be called
+// repeatedly from the application code. The name needs to be loop() for Arduino
+// compatibility.
+void loop();
 
-results = cppTemplate.safe_substitute(
-    kTensor_Arena_Size=kTensor_Arena_Size,
-    model_name=array_name,
-    num_of_operations=num_of_operations,
-    resolver=resolver,
-    model_name_header=x
+#ifdef __cplusplus
+}
+#endif
+
+#endif  // TENSORFLOW_LITE_MICRO_EXAMPLES_HELLO_WORLD_MAIN_FUNCTIONS_H_
+    """
 )
-print("*" * 100)
-print(results)
+
+# main.cc
+main = Template(
+    """
+/* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+==============================================================================*/
+
+#include "main_functions.h"
+
+extern "C" void app_main(void) {
+  setup();
+  while (true) {
+    loop();
+  }
+}
+"""
+)

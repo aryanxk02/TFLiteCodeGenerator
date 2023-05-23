@@ -17,6 +17,10 @@ idf_modify_log.txt
 *.orig
 *.elf
 *.s
+.vscode/
 
 ## Mac OS files
 .DS_Store
+
+## virtual environment
+exp/
