@@ -97,4 +97,9 @@ results = templates.cppTemplate.safe_substitute(
     # layer_desc = '\n'.join([cppTemplate.substitute(layer_desc=i) for i in operations])
 )
 
-print(results)
+# store the results in main_functions.cc inside common folder
+folder_path = "common"
+file_path = os.path.join(folder_path, "main_functions.cc")
+
+with open(file_path, 'w') as file:
+    file.write(results)

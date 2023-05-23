@@ -1,15 +1,3 @@
-common/hello_world_model_data.cc
-/*
-Array name: g_hello_world_model_data
-Name of the Model: g_hello_world_model_data
-Number of Operations: 3
-Model Name Header: hello_world
-Description of Operations: 
-micro_op_resolver.AddDequantize();
-micro_op_resolver.AddFullyConnected();
-micro_op_resolver.AddQuantize();
-*/
-
 /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,8 +20,8 @@ limitations under the License.
 #include "tensorflow/lite/schema/schema_generated.h"
 
 #include "main_functions.h"
-#include "hello_world_gen_micro_mutable_op_resolver.h"
-#include "hello_world_model_data.h"
+#include "cifar10_gen_micro_mutable_op_resolver.h"
+#include "cifar10_model_data.h"
 // #include "constants.h"
 // #include "output_handler.h"
 
@@ -55,7 +43,7 @@ void setup() {
   // copying or parsing, it's a very lightweight operation.
   
   // X: variable =  g_hello_world_model_data
-  model = tflite::GetModel(g_hello_world_model_data);
+  model = tflite::GetModel(g_cifar10_model_data);
   if (model->version() != TFLITE_SCHEMA_VERSION) {
     MicroPrintf("Model provided is schema version %d not equal to supported "
                 "version %d.", model->version(), TFLITE_SCHEMA_VERSION);
@@ -65,7 +53,7 @@ void setup() {
   // This pulls in all the operation implementations we need.
   // NOLINTNEXTLINE(runtime-global-variables)
   // X: variable = Pull all the operations from op_resolver.h file
-  static tflite::MicroMutableOpResolver<3> micro_op_resolver;
+  static tflite::MicroMutableOpResolver<4> micro_op_resolver;
   micro_op_resolver.$layer_description
 
   #  = get_resolver();
@@ -127,5 +115,4 @@ void loop() {
   inference_count += 1;
   if (inference_count >= kInferencesPerCycle) inference_count = 0;
 }
-
 

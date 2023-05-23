@@ -13,21 +13,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-// Generated based on hello_world.tflite.
+// Generated based on cifar10.tflite.
 
 #pragma once
 
 #include "tensorflow/lite/micro/micro_mutable_op_resolver.h"
 
-constexpr int kNumberOperators = 3;
+constexpr int kNumberOperators = 4;
 
 inline tflite::MicroMutableOpResolver<kNumberOperators> get_resolver()
 {
   tflite::MicroMutableOpResolver<kNumberOperators> micro_op_resolver;
 
-  micro_op_resolver.AddDequantize();
+  micro_op_resolver.AddConv2D();
   micro_op_resolver.AddFullyConnected();
-  micro_op_resolver.AddQuantize();
+  micro_op_resolver.AddMaxPool2D();
+  micro_op_resolver.AddReshape();
 
   return micro_op_resolver;
 }
