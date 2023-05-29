@@ -2,7 +2,7 @@ from string import Template
 
 # main_functions.cc
 cppTemplate = Template(
-"""/* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+    """/* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -193,7 +193,7 @@ extern "C" void app_main(void) {
 
 # output_handler.cc
 output_handler_cc = Template(
-"""
+    """
 /* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -222,7 +222,7 @@ void HandleOutput(float x_value, float y_value) {
 
 # output_handler.h
 output_handler_h = Template(
-"""
+    """
 /* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -252,7 +252,7 @@ void HandleOutput(float x_value, float y_value);
 
 # constants.h
 constants_h = Template(
-"""
+    """
 /* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -284,13 +284,13 @@ const float kXrange = 2.f * 3.14159265359f;
 // inference, this value should be defined per-device.
 extern const int kInferencesPerCycle;
 
-#endif  // TENSORFLOW_LITE_MICRO_EXAMPLES_HELLO_WORLD_CONSTANTS_H_
+#endif
 """
 )
 
 # constants.cc
 constants_cc = Template(
-"""
+    """
 /* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -310,5 +310,13 @@ limitations under the License.
 
 // This is a small number so that it's easy to read the logs
 const int kInferencesPerCycle = 20;
+"""
+)
+
+# CMakeLists.txt
+CMakeLists_txt = Template(
+"""
+idf_component_register(SRCS main_functions.cc main.cc {model_name_header}_model_data.cc output_handler.cc constants.cc
+                       INCLUDE_DIRS "")
 """
 )

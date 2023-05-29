@@ -41,17 +41,14 @@ generate_micromutable_op_resolver = [
 subprocess.run(generate_micromutable_op_resolver, check=True)
 
 # subprocess to generate main.cc and main_functions.h templates
-generate_main_templates = [
-    "python",
-    "generate_main_templates.py"
-]
+generate_main_templates = ["python", "generate_main_templates.py"]
 subprocess.run(generate_main_templates, check=True)
 
 # extract model name from .tflite file
 x = tflite_file.split(".")[0]
 
 # extract operations from gen_micro_mutable_op_resolver.h
-with open(f"esp/ops_resolver_output/{x}_gen_micro_mutable_op_resolver.h") as cppfile:
+with open(f"main/{x}_gen_micro_mutable_op_resolver.h") as cppfile:
     operations = []
     for line in cppfile:
         if "micro_op_resolver." in line:
@@ -60,8 +57,8 @@ with open(f"esp/ops_resolver_output/{x}_gen_micro_mutable_op_resolver.h") as cpp
             operations.append(line)
 # print(operations)
 
-
-with open(f"esp/output_dir/{x}_model_data.cc", "r") as file:
+# extract the name of the unsigned integer array
+with open(f"main/{x}_model_data.cc", "r") as file:
     cpp_content = file.read()
 
 pattern = r"const\s+unsigned\s+char\s+(\w+)\[\]"
@@ -101,5 +98,5 @@ results = templates.cppTemplate.safe_substitute(
 folder_path = "main"
 file_path = os.path.join(folder_path, "main_functions.cc")
 
-with open(file_path, 'w') as file:
+with open(file_path, "w") as file:
     file.write(results)
