@@ -21,7 +21,7 @@ tflite_file = args.input_file
 generate_cc_array = [
     "python",
     "generate_cc_arrays.py",
-    "common",
+    "main",
     tflite_file,
 ]
 subprocess.run(generate_cc_array, check=True)
@@ -36,7 +36,7 @@ generate_micromutable_op_resolver = [
     "gen_micro_mutable_op_resolver/generate_micro_mutable_op_resolver_from_model.py",
     "--common_tflite_path=.",
     f"--input_tflite_files={tflite_file}",
-    "--output_dir=common",
+    "--output_dir=main",
 ]
 subprocess.run(generate_micromutable_op_resolver, check=True)
 
@@ -98,7 +98,7 @@ results = templates.cppTemplate.safe_substitute(
 )
 
 # store the results in main_functions.cc inside common folder
-folder_path = "common"
+folder_path = "main"
 file_path = os.path.join(folder_path, "main_functions.cc")
 
 with open(file_path, 'w') as file:
