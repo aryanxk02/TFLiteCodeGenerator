@@ -1,3 +1,4 @@
+# import necessary modules
 import subprocess
 from string import Template
 import os
@@ -8,7 +9,7 @@ import templates
 # subprocess to run generate_cc_array.py
 """
 RUN from tools
-> python generate_cc_arrays.py esp/output_dir esp/TFLITE/hello_world.tflite 
+> python generate_cc_arrays.py main hello_world.tflite 
 """
 
 parser = argparse.ArgumentParser(
@@ -29,7 +30,7 @@ subprocess.run(generate_cc_array, check=True)
 # subprocess to run generate_micromutable_op_resolver.py
 """
 RUN from tools
-> python gen_micro_mutable_op_resolver/generate_micro_mutable_op_resolver_from_model.py --common_tflite_path=esp/TFLITE --input_tflite_files=hello_world.tflite --output_dir=esp/ops_resolver_output
+> python gen_micro_mutable_op_resolver/generate_micro_mutable_op_resolver_from_model.py --common_tflite_path=. --input_tflite_files=hello_world.tflite --output_dir=main
 """
 generate_micromutable_op_resolver = [
     "python",
@@ -40,7 +41,7 @@ generate_micromutable_op_resolver = [
 ]
 subprocess.run(generate_micromutable_op_resolver, check=True)
 
-# subprocess to generate main.cc and main_functions.h templates
+# subprocess to generate .cc and .h templates
 generate_main_templates = ["python", "generate_main_templates.py"]
 subprocess.run(generate_main_templates, check=True)
 
@@ -72,7 +73,6 @@ else:
     print("Array name not found.")
 
 # VARIABLES
-# kTensor_Arena_Size = int(input("Enter kTensor_Arena_Size: "))
 model_name = array_name
 num_of_operations = len(operations)
 resolver = "micro_op_resolver"
@@ -86,24 +86,21 @@ for i in operations:
 print("*/")
 
 results = templates.cppTemplate.safe_substitute(
-    # kTensor_Arena_Size=kTensor_Arena_Size,
     model_name=array_name,
     num_of_operations=num_of_operations,
     resolver=resolver,
     model_name_header=x,
-    # layer_desc = '\n'.join([cppTemplate.substitute(layer_desc=i) for i in operations])
 )
-cmake_template = templates.CMakeLists_txt.safe_substitute(
-    model_name_header=x
-)
+cmake_template = templates.CMakeLists_txt.safe_substitute(model_name_header=x)
 
-# store the results in main_functions.cc inside common folder
+# store the results in main_functions.cc inside main folder
 folder_path = "main"
 file_path = os.path.join(folder_path, "main_functions.cc")
 
 with open(file_path, "w") as file:
     file.write(results)
 
+# x is passed to ${model_header_name} and written inside CMakeLists.txt
 file_path_cmake = os.path.join(folder_path, "CMakeLists.txt")
 with open(file_path_cmake, "w") as file:
     file.write(cmake_template)
