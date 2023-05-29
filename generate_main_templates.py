@@ -7,7 +7,7 @@ output_handler_cc = templates.output_handler_cc
 output_handler_h = templates.output_handler_h
 constants_h = templates.constants_h
 constants_cc = templates.constants_cc
-CMakeLists = templates.CMakeLists_txt
+# CMakeLists = templates.CMakeLists_txt
 
 result_a = main_cc.substitute()
 result_b = main_functions_h.substitute()
@@ -15,7 +15,7 @@ result_c = output_handler_cc.substitute()
 result_d = output_handler_h.substitute()
 result_e = constants_h.substitute()
 result_f = constants_cc.substitute()
-result_g = CMakeLists.substitute()
+# result_g = CMakeLists.substitute()
 
 file_path_a = os.path.join("main", "main.cc")
 with open(file_path_a, "w") as file_a:
@@ -41,6 +41,6 @@ file_path_f = os.path.join("main", "constants.cc")
 with open(file_path_f, "w") as file_f:
     file_f.write(result_f)
 
-file_path_g = os.path.join("main", "CMakeLists.txt")
-with open(file_path_g, "w") as file_g:
-    file_g.write(result_g)
+# file_path_g = os.path.join("main", "CMakeLists.txt")
+# with open(file_path_g, "w") as file_g:
+#     file_g.write(result_g)

@@ -93,6 +93,9 @@ results = templates.cppTemplate.safe_substitute(
     model_name_header=x,
     # layer_desc = '\n'.join([cppTemplate.substitute(layer_desc=i) for i in operations])
 )
+cmake_template = templates.CMakeLists_txt.safe_substitute(
+    model_name_header=x
+)
 
 # store the results in main_functions.cc inside common folder
 folder_path = "main"
@@ -100,3 +103,7 @@ file_path = os.path.join(folder_path, "main_functions.cc")
 
 with open(file_path, "w") as file:
     file.write(results)
+
+file_path_cmake = os.path.join(folder_path, "CMakeLists.txt")
+with open(file_path_cmake, "w") as file:
+    file.write(cmake_template)
