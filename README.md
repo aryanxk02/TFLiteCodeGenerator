@@ -2,18 +2,16 @@
 
 This repository offers a code generation tool designed to facilitate the creation of essential C++ code files necessary for deploying TensorFlow Lite models on Espressif micro-controllers. It caters specifically to the requirements of TensorFlow Lite Micro, enabling seamless integration of machine learning models into embedded systems.
 
-By utilizing this tool, developers can generate optimized C++ code that efficiently executes TensorFlow Lite models, empowering the deployment of machine learning capabilities on a wide range of microcontroller-based or embedded systems. This tool serves as a valuable asset for developers seeking to leverage the power of TensorFlow Lite in the realm of edge computing and IoT applications through Espressif Chipsets.
+By utilizing this tool, developers can generate C++ code that efficiently executes TensorFlow Lite models. This tool serves as a valuable asset for developers seeking to leverage the power of TensorFlow Lite for developing IoT applications through Espressif Chipsets.
 
 
 # Features
 
 - Converts TensorFlow Lite model files (.tflite) into C++ unsigned integer arrays storing hex values of .tflite models for efficient deployment on Espressif Chipsets.
 
-- Generates a micro mutable operation resolver based on the model, which enables runtime selection of various operations associated witht the model.
+- Generates a micro mutable op resolver based on the model, which extracts all the operations associated with the model.
 
 - Creates template code for the main function, simplifying the integration of TensorFlow Lite models into Espressif based real time microcontroller applications.
-
-- Supports customization as per developer's requirements through modifiable templates.
 
 
 # Usage
@@ -21,9 +19,7 @@ By utilizing this tool, developers can generate optimized C++ code that efficien
 This script can convert any tflite model to example template which then can be integrated with any project.
 
 ```
-
 python main.py model.tflite
-
 ```
 This command performs the following:
 
@@ -40,9 +36,7 @@ This command performs the following:
 The command idf.py build is typically associated with the ESP-IDF (Espressif IoT Development Framework), which is the official development framework for the Espressif microcontrollers.
 
 ```
-
 idf.py build
-
 ```
 
 After executing `idf.py build`, it initiates the build process for the current project. This command compiles the source code files, resolves dependencies, and generates the firmware binary that can be flashed onto the Espressif microcontroller. Developers can further use this image for real time applications and use cases.
