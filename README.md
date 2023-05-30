@@ -25,8 +25,7 @@ This script can convert any tflite model to example template which then can be i
 python main.py model.tflite
 
 ```
-
-TFLiteCodeBuilder will perform the following steps:
+This command performs the following:
 
 - Convert the tflite model to a C++ unsigned integer array representation using generate_cc_arrays.py.
 
