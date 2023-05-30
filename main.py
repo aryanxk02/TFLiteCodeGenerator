@@ -1,6 +1,5 @@
 # import necessary modules
 import subprocess
-from string import Template
 import os
 import re
 import argparse
@@ -19,10 +18,13 @@ parser.add_argument("input_file", help=".tflite or .bmp format")
 args = parser.parse_args()
 tflite_file = args.input_file
 
+# extract model name from .tflite file
+x = tflite_file.split(".")[0]
+
 generate_cc_array = [
     "python",
     "generate_cc_arrays.py",
-    "main",
+    f"{x}/main",
     tflite_file,
 ]
 subprocess.run(generate_cc_array, check=True)
@@ -37,19 +39,16 @@ generate_micromutable_op_resolver = [
     "gen_micro_mutable_op_resolver/generate_micro_mutable_op_resolver_from_model.py",
     "--common_tflite_path=.",
     f"--input_tflite_files={tflite_file}",
-    "--output_dir=main",
+    f"--output_dir={x}/main",
 ]
 subprocess.run(generate_micromutable_op_resolver, check=True)
 
 # subprocess to generate .cc and .h templates
-generate_main_templates = ["python", "generate_main_templates.py"]
-subprocess.run(generate_main_templates, check=True)
-
-# extract model name from .tflite file
-x = tflite_file.split(".")[0]
+# generate_main_templates = ["python", "generate_main_templates.py"]
+# subprocess.run(generate_main_templates, check=True)
 
 # extract operations from gen_micro_mutable_op_resolver.h
-with open(f"main/{x}_gen_micro_mutable_op_resolver.h") as cppfile:
+with open(f"{x}/main/{x}_gen_micro_mutable_op_resolver.h") as cppfile:
     operations = []
     for line in cppfile:
         if "micro_op_resolver." in line:
@@ -59,7 +58,7 @@ with open(f"main/{x}_gen_micro_mutable_op_resolver.h") as cppfile:
 # print(operations)
 
 # extract the name of the unsigned integer array
-with open(f"main/{x}_model_data.cc", "r") as file:
+with open(f"{x}/main/{x}_model_data.cc", "r") as file:
     cpp_content = file.read()
 
 pattern = r"const\s+unsigned\s+char\s+(\w+)\[\]"
@@ -76,7 +75,7 @@ else:
 """
 Format the unsigned int array from model_data.cc file
 """
-with open(f"main/{x}_model_data.cc", "r+") as file:
+with open(f"{x}/main/{x}_model_data.cc", "r+") as file:
     cpp_code = file.read()
 
     start_index = cpp_code.find("alignas(16) const unsigned char")
@@ -131,7 +130,7 @@ results = templates.cppTemplate.safe_substitute(
 cmake_template = templates.CMakeLists_txt.safe_substitute(model_name_header=x)
 
 # store the results in main_functions.cc inside main folder
-folder_path = "main"
+folder_path = f"{x}/main"
 file_path = os.path.join(folder_path, "main_functions.cc")
 
 with open(file_path, "w") as file:
@@ -141,3 +140,52 @@ with open(file_path, "w") as file:
 file_path_cmake = os.path.join(folder_path, "CMakeLists.txt")
 with open(file_path_cmake, "w") as file:
     file.write(cmake_template)
+
+"""
+The following code generates:
+- main.cc
+- main_functions.h
+- output_handler.cc
+- output_handler.h
+- constants.h
+- constants.cc
+- Top Level: CMakeLists.txt
+"""
+
+main_cc = templates.main_cc
+main_functions_h = templates.main_functions
+output_handler_cc = templates.output_handler_cc
+output_handler_h = templates.output_handler_h
+constants_h = templates.constants_h
+constants_cc = templates.constants_cc
+CMakeLists_txt = templates.CMakeLists_txt
+topLevelCMakeList = templates.topLevelCMake
+
+result_a = main_cc.substitute()
+result_b = main_functions_h.substitute()
+result_c = output_handler_cc.substitute()
+result_d = output_handler_h.substitute()
+result_e = constants_h.substitute()
+result_f = constants_cc.substitute()
+result_g = topLevelCMakeList.safe_substitute()
+
+files = {
+    "main.cc": result_a,
+    "main_functions.h": result_b,
+    "output_handler.cc": result_c,
+    "output_handler.h": result_d,
+    "constants.h": result_e,
+    "constants.cc": result_f,
+}
+
+# top level CMakeLists.txt
+directory = f"{x}/main"
+for filename, result in files.items():
+    file_path = os.path.join(directory, filename)
+    with open(file_path, "w") as file:
+        print(filename)
+        file.write(result)
+
+file_path_topCMake = os.path.join(f"{x}", "CMakeLists.txt")
+with open(file_path_topCMake, "w") as file_g:
+    file_g.write(result_g)

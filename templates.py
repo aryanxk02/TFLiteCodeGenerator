@@ -163,7 +163,7 @@ void loop();
 )
 
 # main.cc
-main = Template(
+main_cc = Template(
     """
 /* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
 
@@ -318,5 +318,16 @@ CMakeLists_txt = Template(
 """
 idf_component_register(SRCS main_functions.cc main.cc ${model_name_header}_model_data.cc output_handler.cc constants.cc
                        INCLUDE_DIRS "")
+"""
+)
+
+topLevelCMake = Template(
+    r"""
+# The following lines of boilerplate have to be in your project's
+# CMakeLists in this exact order for cmake to work correctly
+cmake_minimum_required(VERSION 3.5)
+set(EXTRA_COMPONENT_DIRS /Users/aryan/Work/tflite-micro-esp-examples/components)
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(test)
 """
 )
