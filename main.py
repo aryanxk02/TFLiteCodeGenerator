@@ -72,6 +72,43 @@ if match:
 else:
     print("Array name not found.")
 
+
+"""
+Format the unsigned int array from model_data.cc file
+"""
+with open(f"main/{x}_model_data.cc", "r+") as file:
+    cpp_code = file.read()
+
+    start_index = cpp_code.find("alignas(16) const unsigned char")
+    end_index = cpp_code.find("};", start_index)
+
+    array_string = cpp_code[start_index:end_index]
+
+    elements = [element.strip() for element in array_string.split(",")]
+
+    formatted_elements = []
+    for i, element in enumerate(elements):
+        if len(element) == 3:
+            if element == "0x0":
+                element = "0x00"
+            else:
+                element = element[:2] + "0" + element[2:]
+        formatted_elements.append(element)
+
+    formatted_array_lines = []
+    for i in range(0, len(formatted_elements), 12):
+        line_elements = formatted_elements[i:i + 12]
+        line = ", ".join(line_elements)
+        formatted_array_lines.append(line)
+
+    formatted_array_string = ",\n".join(formatted_array_lines)
+
+    formatted_cpp_code = cpp_code[:start_index] + formatted_array_string + cpp_code[end_index:]
+
+    file.seek(0)
+    file.truncate()
+    file.write(formatted_cpp_code)
+
 # VARIABLES
 model_name = array_name
 num_of_operations = len(operations)
