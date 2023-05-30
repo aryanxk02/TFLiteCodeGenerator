@@ -1,3 +1,11 @@
+"""
+
+SPDX-FileCopyrightText: 2023 Espressif Systems (Shanghai) CO LTD
+
+SPDX-License-Identifier: Apache-2.0
+
+"""
+
 from string import Template
 
 # main_functions.cc
@@ -315,7 +323,7 @@ const int kInferencesPerCycle = 20;
 
 # CMakeLists.txt
 CMakeLists_txt = Template(
-"""
+    """
 idf_component_register(SRCS main_functions.cc main.cc ${model_name_header}_model_data.cc output_handler.cc constants.cc
                        INCLUDE_DIRS "")
 """

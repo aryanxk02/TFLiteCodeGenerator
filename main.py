@@ -1,3 +1,11 @@
+"""
+
+SPDX-FileCopyrightText: 2023 Espressif Systems (Shanghai) CO LTD
+
+SPDX-License-Identifier: Apache-2.0
+
+"""
+
 # import necessary modules
 import subprocess
 import os
@@ -96,13 +104,15 @@ with open(f"{x}/main/{x}_model_data.cc", "r+") as file:
 
     formatted_array_lines = []
     for i in range(0, len(formatted_elements), 12):
-        line_elements = formatted_elements[i:i + 12]
+        line_elements = formatted_elements[i : i + 12]
         line = ", ".join(line_elements)
         formatted_array_lines.append(line)
 
     formatted_array_string = ",\n".join(formatted_array_lines)
 
-    formatted_cpp_code = cpp_code[:start_index] + formatted_array_string + cpp_code[end_index:]
+    formatted_cpp_code = (
+        cpp_code[:start_index] + formatted_array_string + cpp_code[end_index:]
+    )
 
     file.seek(0)
     file.truncate()
